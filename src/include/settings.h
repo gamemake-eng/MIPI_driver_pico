@@ -75,6 +75,7 @@ extern "C" {
 #define DISPLAY_INVERT 0
 #endif
 
+
 //C++ compatibility
 #ifdef __cplusplus
 }
