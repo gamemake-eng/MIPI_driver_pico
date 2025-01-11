@@ -112,10 +112,39 @@ void push_pixels(void *_color, size_t len) {
     size_t size = len;
     uint16_t *color = _color;
 
+    //Set DC to high to enable data transfer
+    gpio_put(DISPLAY_DC, 1);
+    //Set CS to low to enable spi device
+    gpio_put(DISPLAY_CS, 0);
+    //Set spi format to whatever is set (default is 16-bit)
+    spi_set_format(DISPLAY_SPI_PORT, MIPI_PIXEL_DEPTH, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
+
+    //Loop through the list and send data through the data register
     while(size--){
+        //wait until you can write into the spi port
         while(!spi_is_writable(DISPLAY_SPI_PORT)){}
-        spi_get_hw(DISPLAY_SPI_PORT)->dr = (uint32_t) *color++;
+        spi_get_hw(DISPLAY_SPI_PORT)->dr = (uint32_t) htons(*color);
     }
+
+    //Wait for shifting to finish
+    while (spi_get_hw(DISPLAY_SPI_PORT)->sr & SPI_SSPSR_BSY_BITS) {}
+    spi_get_hw(DISPLAY_SPI_PORT)->icr = SPI_SSPICR_RORIC_BITS;
+
+    //Set the spi format back to 8-bit
+    spi_set_format(DISPLAY_SPI_PORT, 8, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
+
+    //Disable spi device by setting CS to high
+    gpio_put(DISPLAY_CS, 1);
+
+}
+
+void display_section_fill(uint16_t x1, uint16_t y1, uint16_t w, uint16_t h, void *color) {
+    int32_t x2 = x1 + w - 1;
+    int32_t y2 = y1 + h - 1;
+
+    set_address_window(x1, y1, x2, y2);
+
+    push_pixels(*color, w*h);
 }
 
 void init_mipi_spi() {
