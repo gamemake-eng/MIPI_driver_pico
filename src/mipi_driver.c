@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 
+#include <hardware/dma.h>
 #include <hardware/spi.h>
 #include <hardware/gpio.h>
 #include <pico/time.h>
@@ -15,6 +16,11 @@ inline uint16_t htons(uint16_t i){
     __asm ("rev16 %0, %0" : "+l" (i) : : );
     return i;
 }
+
+#ifdef MIPI_USE_DMA
+const uint dma_c;
+dma_channel_config dma_c_config;
+#endif
 
 void send_mipi_command(uint8_t cmd){
     //As seen in page 30 of the st7735 datasheet, you set DC to low for commands
@@ -116,6 +122,15 @@ void display_section_fill(uint16_t x1, uint16_t y1, uint16_t w, uint16_t h, uint
 
 
 }
+
+#ifdef MIPI_USE_DMA
+void init_mipi_dma() {
+    dma_c = dma_claim_unused_channel(true);
+    dma_c_config = dma_channel_get_default_config(dma-c);
+    channel_config_set_transfer_data_size(&c, DMA_SIZE_8);
+
+}
+#endif
 
 void init_mipi_spi() {
     //Enable DC and CS pins
