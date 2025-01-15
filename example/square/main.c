@@ -17,7 +17,7 @@ int main(){
 	
  	uint8_t bb[(DISPLAY_WIDTH*DISPLAY_HEIGHT)*MIPI_PIXEL_DEPTH/8];
 	uint8_t bb2[(DISPLAY_WIDTH*DISPLAY_HEIGHT)*MIPI_PIXEL_DEPTH/8];
-	uint8_t buffer = 0;
+	uint8_t *buffer = bb;
 
 	init_mipi_display();
 
@@ -49,36 +49,23 @@ int main(){
 
 		for(int i = 0; i < (DISPLAY_WIDTH*DISPLAY_HEIGHT)*MIPI_PIXEL_DEPTH/8; i++){
 	    		//Make display white
-			if(buffer == 0){
-	    			bb[i] = 0xFF;
-			}
-			else{
-				bb2[i] = 0xFF;
-			}
-
+			buffer[i] = 0xff;
 		}
 
 		//Draw a rectangle
 		//DRAW_RECT((uint8_t)floor(x), (uint8_t)floor(y), 16, 16,bb);
 
-		if(buffer==0){
-			memcpy(bb2, bb, sizeof(bb));
-			buffer=1;
+		if(buffer==bb){
+			buffer = bb2;
 		}else {
-			memcpy(bb, bb2, sizeof(bb2));   
-			buffer=0;
+			buffer = bb;
 		}
 		//Flip screen
-		if(buffer == 0){
-			//Draw a rectangle
-                	DRAW_RECT((uint8_t)floor(x), (uint8_t)floor(y), 16, 16,bb);   
-			display_section_fill(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, bb);
-		}
-		else{
-			//Draw a rectangle
-                	DRAW_RECT((uint8_t)floor(x), (uint8_t)floor(y), 16, 16,bb2);   
-			display_section_fill(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, bb2);  
-		}
+		
+		//Draw a rectangle
+                DRAW_RECT((uint8_t)floor(x), (uint8_t)floor(y), 16, 16,buffer);   
+		
+		display_section_fill(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, buffer);
 
 	}
 
