@@ -43,3 +43,10 @@ target_link_libraries(square_test
 #pico_set_double_implementation(hagl_test pico)
 
 pico_add_extra_outputs(square_test)
+
+add_compile_definitions(square_test PRIVATE
+	
+	DEBUG_MIPI=1
+	MIPI_USE_DMA=1
+
+)

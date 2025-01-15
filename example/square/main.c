@@ -1,5 +1,8 @@
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <pico/stdlib.h>
+#include <hardware/gpio.h>
 #include "../../src/include/mipi_driver.h"
 #include "../../src/include/settings.h"
 #include "../../src/include/mipi_dcs.h"
@@ -9,21 +12,24 @@
 #define DRAW_RECT(x,y,w,h) for(int i = 0; i < w; i++){for(int j = 0; j < h; j++){bb[((i+x)+(j+y)*DISPLAY_WIDTH)*MIPI_PIXEL_DEPTH/8] = 0;bb[((i+x)+(j+y)*DISPLAY_WIDTH)*MIPI_PIXEL_DEPTH/8+1] = 0;}}
 
 int main(){
-    uint8_t bb[(DISPLAY_WIDTH*DISPLAY_HEIGHT)*MIPI_PIXEL_DEPTH/8];
+	setup_default_uart();
+	
+ 	uint8_t bb[(DISPLAY_WIDTH*DISPLAY_HEIGHT)*MIPI_PIXEL_DEPTH/8];
 
-    init_mipi_display();
+	init_mipi_display();
 
-    float x=0;
-    float y=0;
+	float x=0;
+	float y=0;
 
-    int dx = 1;
+	int dx = 1;
 	int dy = 1;
 
 	float speed = 1.5;
 
 
-    while(1){
-        x += dx*speed;
+	while(1){
+		//gpio_put(25,1);
+		x += dx*speed;
 		y += dy*speed;
 
 		if(x <= 0){
@@ -38,18 +44,19 @@ int main(){
 			dy = -1;
 		}
 
-        for(int i = 0; i < (DISPLAY_WIDTH*DISPLAY_HEIGHT)*MIPI_PIXEL_DEPTH/8; i++){
-            //Make display white
-            bb[i] = 0xff;
+		for(int i = 0; i < (DISPLAY_WIDTH*DISPLAY_HEIGHT)*MIPI_PIXEL_DEPTH/8; i++){
+	    		//Make display white
+	    		bb[i] = 0xFF;
 
-        }
+		}
 
-        //Draw a rectangle
-        DRAW_RECT((uint8_t)floor(x), (uint8_t)floor(y), 16, 16);
+		//Draw a rectangle
+		DRAW_RECT((uint8_t)floor(x), (uint8_t)floor(y), 16, 16);
 
-        //Flip screen
-        display_section_fill(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, bb);
-    }
+		//Flip screen
+		display_section_fill(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, bb);
+		//gpio_put(25,0);
+	}
 
-    return 0;
+	return 0;
 }
