@@ -37,7 +37,7 @@ extern "C" {
 #endif
 
 #ifndef SPI_CLOCK_SPEED
-#define SPI_CLOCK_SPEED 68000000
+#define SPI_CLOCK_SPEED 62500000
 #endif
 
 #ifndef DISPLAY_OFFSET_X
