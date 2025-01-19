@@ -3,10 +3,6 @@ cmake_minimum_required(VERSION 3.13)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
-# Comment out these lines for the RP2040
-set(PICO_BOARD pico2)
-set(PICO_PLATFORM rp2350)
-
 # Default path to the SDK
 if (NOT PICO_SDK_PATH)
   set(PICO_SDK_PATH "../pico-sdk")
@@ -34,8 +30,8 @@ target_link_libraries(square_test pico_stdlib)
 target_link_libraries(square_test
         hardware_spi
         hardware_dma
-		pico_float
-		pico_double
+	#pico_float
+	#pico_double
 
 )
 
